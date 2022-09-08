@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Avatar, Button, Paper, Grid, Typography, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+//import { GoogleLogin } from '@react-oauth/google';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import { signin, signup } from '../../actions/auth';
@@ -10,6 +10,10 @@ import { AUTH } from '../../constants/actionTypes';
 import useStyles from './styles';
 import Input from './Input';
 
+import { GoogleLogin } from 'react-google-login';
+import { gapi } from 'gapi-script';
+
+const clientId = '463622409928-lsbll748mvul1s8hetcodo9nduabd573.apps.googleusercontent.com';
 const initialState = { firstName: '', lastName: '', email: '', password: '', confirmPassword: '' };
 
 const SignUp = () => {
@@ -21,6 +25,16 @@ const SignUp = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const handleShowPassword = () => setShowPassword(!showPassword);
+
+  useEffect(() => {
+    const initClient = () => {
+          gapi.client.init({
+          clientId: clientId,
+          scope: ''
+        });
+     };
+     gapi.load('client:auth2', initClient);
+ });
 
   const switchMode = () => {
     setForm(initialState);
@@ -39,9 +53,10 @@ const SignUp = () => {
   };
 
   const googleSuccess = async (res) => {
+    console.log(res);
     const result = res?.profileObj;
+    console.log(result);
     const token = res?.tokenId;
-
     try {
       dispatch({ type: AUTH, data: { result, token } });
 
@@ -77,7 +92,13 @@ const SignUp = () => {
           <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
             { isSignup ? 'Sign Up' : 'Sign In' }
           </Button>
-          <GoogleLogin onSuccess={googleSuccess} onFailure={googleError} cookiePolicy="single_host_origin"/>
+          <GoogleLogin 
+            clientId={clientId}
+            buttonText="Sign in with Google"
+            onSuccess={googleSuccess} 
+            onFailure={googleError} 
+            cookiePolicy={"single_host_origin"}
+          />
           <Grid container justifyContent="flex-end">
             <Grid item>
               <Button onClick={switchMode} >
