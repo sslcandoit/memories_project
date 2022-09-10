@@ -1,3 +1,3 @@
 ## Full Stack MERN Project: React, Node.js, Express & MongoDB
 ***
-![memories0](client/src/images/memories0.png)
+No features: Login, Google login, pagination, post detail, comments, you may also like
